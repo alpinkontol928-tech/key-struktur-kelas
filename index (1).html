@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struktur Organisasi X TKR 4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* CSS SAMA SEPERTI SEBELUMNYA – DISINGKAT AGAR MUAT, TAPI TETAP LENGKAP */
+        /* (saya tulis ulang lengkap di bawah) */
+        html { scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050505;
+            color: #e0e0e0;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, #0ff, transparent),
+                radial-gradient(2px 2px at 40% 70%, #f0f, transparent),
+                radial-gradient(2px 2px at 60% 20%, #0ff, transparent),
+                radial-gradient(2px 2px at 80% 60%, #f0f, transparent),
+                radial-gradient(2px 2px at 10% 90%, #0f0, transparent),
+                radial-gradient(2px 2px at 90% 10%, #f0f, transparent);
+            background-size: 200% 200%;
+            animation: particles 8s linear infinite;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes particles {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #050505;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .neon-loader {
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-top: 4px solid #0ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            box-shadow: 0 0 30px #0ff;
+        }
+        .neon-loader::after {
+            content: '';
+            position: absolute;
+            inset: 10px;
+            border: 4px solid transparent;
+            border-bottom: 4px solid #f0f;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite reverse;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #loading-screen p {
+            margin-top: 20px;
+            font-family: 'Orbitron', monospace;
+            color: #0ff;
+            text-shadow: 0 0 20px #0ff;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        #login-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(5,5,5,0.9);
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .login-box {
+            background: rgba(5,5,5,0.8);
+            border: 1px solid #0ff;
+            border-radius: 24px;
+            padding: 40px 50px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0,255,255,0.15);
+        }
+        .login-box h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #0ff;
+            text-shadow: 0 0 20px #0ff;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        .login-box p { color: #aaa; margin-bottom: 24px; }
+        .login-box input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(0,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        .login-box input:focus {
+            border-color: #0ff;
+            box-shadow: 0 0 30px rgba(0,255,255,0.1);
+        }
+        .login-box button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 16px;
+            border-radius: 40px;
+            border: none;
+            background: #0ff;
+            color: #050505;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 30px rgba(0,255,255,0.2);
+        }
+        .login-box button:hover { transform: scale(1.02); box-shadow: 0 0 60px #0ff; }
+        #login-error { color: #ff2d55; margin-top: 12px; font-weight: 600; display: none; }
+        #skip-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: #aaa;
+            padding: 10px;
+            border-radius: 40px;
+            width: 100%;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #skip-btn:hover { background: rgba(255,255,255,0.05); border-color: #0ff; color: #fff; }
+        #main-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: rgba(5,5,5,0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0,255,255,0.2);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .logo-area { display: flex; align-items: center; gap: 20px; }
+        .logo-area img {
+            width: 70px; height: 70px; border-radius: 50%;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 20px #0ff;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .logo-text h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #0ff, #f0f, #0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0,255,255,0.3);
+        }
+        .logo-text h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #aaa;
+            letter-spacing: 2px;
+        }
+        .header-info { text-align: right; font-size: 1rem; color: #ccc; }
+        .header-info p { margin: 4px 0; }
+        .header-info p:first-child {
+            font-weight: 600;
+            color: #0ff;
+            text-shadow: 0 0 10px rgba(0,255,255,0.3);
+            cursor: pointer;
+        }
+        .header-info p:nth-child(2) { cursor: pointer; }
+        .datetime-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            background: rgba(5,5,5,0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            border: 1px solid rgba(0,255,255,0.15);
+            box-shadow: 0 0 30px rgba(0,255,255,0.05);
+        }
+        .clock {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0ff;
+            text-shadow: 0 0 30px #0ff, 0 0 60px #0ff;
+        }
+        .date {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 300;
+            color: #aaa;
+            align-self: center;
+        }
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .neon-btn {
+            background: transparent;
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0,255,255,0.1);
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .neon-btn:hover {
+            background: #0ff;
+            color: #050505;
+            box-shadow: 0 0 40px #0ff, 0 0 80px #0ff;
+            transform: scale(1.05);
+        }
+        .search-bar {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border-radius: 60px;
+            border: 1px solid rgba(0,255,255,0.2);
+            background: rgba(5,5,5,0.8);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        .search-bar input:focus {
+            border-color: #0ff;
+            box-shadow: 0 0 30px rgba(0,255,255,0.2);
+        }
+        .search-bar .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0ff;
+            font-size: 1.2rem;
+        }
+        .structure {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 20px 0 40px;
+        }
+        .card {
+            background: rgba(5,5,5,0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0,255,255,0.15);
+            border-radius: 20px;
+            padding: 16px 24px;
+            text-align: center;
+            min-width: 160px;
+            box-shadow: 0 0 20px rgba(0,255,255,0.05);
+            transition: opacity 0.5s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.3s ease;
+            position: relative;
+            cursor: default;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        .card.visible { opacity: 1; transform: translateY(0); }
+        .card:hover {
+            border-color: #0ff;
+            box-shadow: 0 0 40px rgba(0,255,255,0.2), inset 0 0 20px rgba(0,255,255,0.05);
+            transform: translateY(-4px);
+        }
+        .card .avatar {
+            width: 70px; height: 70px; border-radius: 50%;
+            margin: 0 auto 10px;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 20px rgba(0,255,255,0.2);
+            object-fit: cover;
+            transition: 0.3s;
+        }
+        .card:hover .avatar { border-color: #f0f; box-shadow: 0 0 30px #f0f; }
+        .card .name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+        .card .position {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            font-size: 0.85rem;
+            color: #0ff;
+            text-shadow: 0 0 10px rgba(0,255,255,0.2);
+        }
+        .card.editable .name,
+        .card.editable .position {
+            outline: 1px dashed #0ff;
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: rgba(0,255,255,0.05);
+        }
+        .card.editable .name:focus,
+        .card.editable .position:focus {
+            outline: 2px solid #0ff;
+            background: rgba(0,255,255,0.1);
+        }
+        .card .upload-photo {
+            display: block;
+            margin: 6px auto 0;
+            font-size: 0.7rem;
+            color: #0ff;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+        .card .upload-photo:hover { opacity: 1; }
+        .connector {
+            width: 2px;
+            height: 30px;
+            background: linear-gradient(to bottom, #0ff, #f0f);
+            box-shadow: 0 0 15px #0ff;
+            position: relative;
+            opacity: 0;
+            transition: opacity 0.6s ease 0.1s;
+        }
+        .connector::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: -4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #0ff;
+            box-shadow: 0 0 20px #0ff;
+        }
+        .connector.visible { opacity: 1; }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px 60px;
+            margin: 4px 0;
+            position: relative;
+        }
+        .row .card { min-width: 140px; }
+        .row-connector {
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #0ff, #f0f, #0ff, transparent);
+            box-shadow: 0 0 20px #0ff;
+            margin: 0 auto 10px;
+            opacity: 0;
+            transition: opacity 0.6s ease 0.1s;
+        }
+        .row-connector.visible { opacity: 1; }
+        footer {
+            text-align: center;
+            padding: 20px 0 10px;
+            font-size: 0.9rem;
+            color: #888;
+            border-top: 1px solid rgba(0,255,255,0.1);
+            margin-top: 30px;
+        }
+        footer p { margin: 2px 0; }
+        @media (max-width:768px) {
+            .header { flex-direction: column; text-align: center; }
+            .header-info { text-align: center; margin-top: 10px; }
+            .logo-area { justify-content: center; }
+            .clock { font-size: 1.6rem; }
+            .date { font-size: 1rem; }
+            .card { min-width: 120px; padding: 12px 16px; }
+            .card .avatar { width: 56px; height: 56px; }
+            .row { gap: 20px; }
+            .row-connector { width: 80%; }
+            .login-box { padding: 30px 24px; }
+        }
+        @media (max-width:480px) {
+            .logo-text h1 { font-size: 1.2rem; }
+            .logo-text h2 { font-size: 0.9rem; }
+            .clock { font-size: 1.3rem; }
+            .datetime-bar { gap: 10px; padding: 8px 16px; }
+            .card { min-width: 100px; padding: 8px 12px; }
+            .card .avatar { width: 44px; height: 44px; }
+            .card .name { font-size: 0.9rem; }
+            .card .position { font-size: 0.7rem; }
+            .row { gap: 12px; }
+        }
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0,255,255,0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid #0ff;
+            border-radius: 16px;
+            padding: 14px 28px;
+            color: #0ff;
+            font-weight: 500;
+            box-shadow: 0 0 40px rgba(0,255,255,0.15);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68,-0.55,0.27,1.55);
+            z-index: 999;
+            pointer-events: none;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        .ripple {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(0,255,255,0.2);
+            transform: scale(0);
+            animation: rippleAnim 0.8s ease-out forwards;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        @keyframes rippleAnim { to { transform: scale(6); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOADING SCREEN ===== -->
+    <div id="loading-screen">
+        <div class="neon-loader"></div>
+        <p>Memuat Data...</p>
+    </div>
+
+    <!-- ===== LOGIN MODAL ===== -->
+    <div id="login-modal">
+        <div class="login-box">
+            <h2><i class="fas fa-lock"></i> Admin Login</h2>
+            <p>Masukkan password untuk mengelola data</p>
+            <input type="password" id="password-input" placeholder="Password..." />
+            <button id="login-btn"><i class="fas fa-sign-in-alt"></i> Masuk</button>
+            <div id="login-error">Password salah!</div>
+            <button id="skip-btn"><i class="fas fa-eye"></i> Skip & Lihat sebagai Tamu</button>
+            <div style="margin-top:8px; font-size:0.8rem; color:#666;">(Tanpa akses edit)</div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div id="main-content" style="display:none;">
+        <header class="header">
+            <div class="logo-area">
+                <img id="logo-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23075e54'/%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='30' fill='white' font-family='sans-serif'%3EX%3C/text%3E%3C/svg%3E" alt="Logo">
+                <div class="logo-text">
+                    <h1>STRUKTUR ORGANISASI</h1>
+                    <h2>KELAS X TKR 4</h2>
+                </div>
+            </div>
+            <div class="header-info">
+                <p id="school-name">SMK Negeri 1 Jakarta</p>
+                <p id="academic-year">Tahun Ajaran 2026/2027</p>
+                <button id="login-btn-header" style="display:none; background:transparent; border:1px solid #0ff; color:#0ff; padding:6px 16px; border-radius:20px; cursor:pointer; margin-top:8px;">
+                    <i class="fas fa-sign-in-alt"></i> Login Admin
+                </button>
+                <button id="logout-btn" style="display:none; background:transparent; border:1px solid #ff2d55; color:#ff2d55; padding:6px 16px; border-radius:20px; cursor:pointer; margin-top:8px;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="datetime-bar">
+            <div class="clock" id="clock">00:00:00 WIB</div>
+            <div class="date" id="date">Senin, 1 Januari 2026</div>
+        </div>
+
+        <div class="action-bar" id="action-bar" style="display:none;">
+            <button class="neon-btn" id="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+            <button class="neon-btn" id="save-btn" style="display:none;"><i class="fas fa-save"></i> Simpan</button>
+            <button class="neon-btn" id="reset-btn"><i class="fas fa-undo"></i> Reset</button>
+            <button class="neon-btn" id="fullscreen-btn"><i class="fas fa-expand"></i> Fullscreen</button>
+            <button class="neon-btn" id="print-btn"><i class="fas fa-print"></i> Print</button>
+            <button class="neon-btn" id="pdf-btn"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            <button class="neon-btn" id="png-btn"><i class="fas fa-image"></i> Download PNG</button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Cari nama anggota..." />
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <section class="structure" id="structure-container"></section>
+
+        <footer>
+            <p>&copy; 2026 - X TKR 4 - Dibangun dengan <i class="fas fa-heart" style="color:#ff2d55;"></i> dan Neon</p>
+            <p style="font-family:'Orbitron',sans-serif; color:#0ff; text-shadow:0 0 10px #0ff; margin-top:4px; font-size:0.9rem; letter-spacing:2px;">BY KEY X TKR 4</p>
+        </footer>
+    </div>
